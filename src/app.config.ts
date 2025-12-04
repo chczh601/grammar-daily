@@ -1,25 +1,50 @@
-const pages = ['pages/home/index', 'pages/login/index']
+const pages = [
+  'pages/practice/index',
+  'pages/report/index',
+  'pages/knowledge/index',
+  'pages/profile/index',
+  'pages/knowledge-detail/index',
+  'pages/favorites/index'
+]
 
-//  To fully leverage TypeScript's type safety and ensure its correctness, always enclose the configuration object within the global defineAppConfig helper function.
 export default defineAppConfig({
   pages,
   tabBar: {
-    // at least two items are required
+    color: '#8B92A8',
+    selectedColor: '#4C9AFF',
+    backgroundColor: '#FFFFFF',
+    borderStyle: 'white',
     list: [
       {
-        pagePath: 'pages/home/index',
-        text: 'Home'
+        pagePath: 'pages/practice/index',
+        text: '每日练习',
+        iconPath: './assets/images/unselected/practice.png',
+        selectedIconPath: './assets/images/selected/practice.png'
+      },
+      {
+        pagePath: 'pages/report/index',
+        text: '学习报告',
+        iconPath: './assets/images/unselected/report.png',
+        selectedIconPath: './assets/images/selected/report.png'
+      },
+      {
+        pagePath: 'pages/knowledge/index',
+        text: '语法知识',
+        iconPath: './assets/images/unselected/knowledge.png',
+        selectedIconPath: './assets/images/selected/knowledge.png'
+      },
+      {
+        pagePath: 'pages/profile/index',
+        text: '我的',
+        iconPath: './assets/images/unselected/profile.png',
+        selectedIconPath: './assets/images/selected/profile.png'
       }
-      // {
-      //     pagePath: 'pages/welcome/index',
-      //     text: 'welcome'
-      // }
     ]
   },
   window: {
     backgroundTextStyle: 'light',
-    navigationBarBackgroundColor: '#fff',
-    navigationBarTitleText: 'WeChat',
-    navigationBarTextStyle: 'black'
+    navigationBarBackgroundColor: '#4C9AFF',
+    navigationBarTitleText: '英语语法每日一练',
+    navigationBarTextStyle: 'white'
   }
 })

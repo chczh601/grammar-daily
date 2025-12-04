@@ -1,56 +1,211 @@
-# Project Overview
+# 英语语法每日一练小程序
 
-This repository is a Taro + React + TypeScript starter project for WeChat Mini-Programs and mobile H5, styled with Tailwind CSS and managed via pnpm.
-This document explains how to set up your local environment, develop, test, lint, and build the project.
+这是一个基于 Taro + React + TypeScript 开发的英语语法学习微信小程序，旨在帮助用户通过每日练习提升英语语法能力。
+
+## 项目概述
+
+**核心定位**：打造轻量化、碎片化的英语语法学习工具，通过每日一次的针对性练习，帮助学生及职场人士等泛英语学习者营造易于坚持、渐进提升的学习体验。
+
+**设计风格**：简洁明快，采用蓝色系（专业感）与暖黄色系（活力感）的配色方案，符合微信生态的用户习惯，平衡学习的专业性与产品的易用性。
+
+## 核心功能
+
+### 1. 每日练习模块
+- 每日推送10道题目，题型包括单选、填空、改错
+- 题目按语法模块（时态、从句、非谓语动词、虚拟语气、主谓一致）和难度（入门/进阶/高阶）分类
+- 答题后即时反馈正误，显示精简解析（包含规则提炼和易错点提示）
+- 支持一键收藏错题
+
+### 2. 学习进度与数据管理
+- 自动记录每日完成情况与正确率
+- 生成周报，可视化展示已掌握知识点与薄弱环节
+- 基于薄弱点，智能推送补充练习题
+
+### 3. 语法知识库
+- 提供按模块划分的轻量化语法规则讲解
+- 可便捷跳转至相关练习题
+
+### 4. 用户激励与互动
+- 每日打卡机制，连续打卡可解锁语法技巧
+- 支持将打卡成果分享至微信好友或朋友圈
+- 错题本功能，方便复习巩固
+
+## 技术架构
+
+### 技术栈
+- **前端框架**：Taro 3.x + React 18 + TypeScript
+- **样式方案**：Tailwind CSS
+- **状态管理**：React Hooks
+- **数据库**：Supabase（PostgreSQL）
+- **构建工具**：Webpack 5
+
+### 项目结构
+
+```
+├── src/
+│   ├── app.config.ts               # Taro应用配置，定义路由和底部导航栏
+│   ├── app.scss                    # 全局样式和设计系统变量
+│   ├── app.tsx                     # 应用入口文件
+│   ├── assets/                     # 静态资源
+│   │   └── images/                 # 图片资源
+│   │       ├── selected/           # 底部导航选中态图标
+│   │       └── unselected/         # 底部导航未选中态图标
+│   ├── client/
+│   │   └── supabase.ts             # Supabase客户端配置
+│   ├── db/                         # 数据库操作层
+│   │   ├── api.ts                  # 数据库API函数
+│   │   └── types.ts                # 数据库类型定义
+│   ├── pages/                      # 页面组件
+│   │   ├── practice/               # 每日练习页（首页）
+│   │   ├── report/                 # 学习报告页
+│   │   ├── knowledge/              # 语法知识库列表页
+│   │   ├── knowledge-detail/       # 语法知识详情页
+│   │   ├── profile/                # 个人中心页
+│   │   └── favorites/              # 错题本页
+│   └── types/                      # TypeScript类型定义
+└── supabase/
+    └── migrations/                 # 数据库迁移文件
+        └── *.sql                   # SQL迁移脚本
+
+```
+
+## 数据库设计
+
+### 核心表结构
+
+1. **grammar_modules** - 语法模块表
+   - 存储语法模块信息（时态、从句等）
+   - 包含模块名称、描述、规则讲解内容
+
+2. **questions** - 题目表
+   - 存储所有练习题目
+   - 包含题型、难度、题目内容、选项、答案、解析、标签等
+
+3. **user_records** - 用户学习记录表
+   - 记录用户答题情况
+   - 包含答题记录、正确性、收藏状态等
+
+4. **daily_practice** - 每日练习配置表
+   - 存储每日推送的题目列表
+   - 自动生成每日10道随机题目
+
+5. **check_in_records** - 打卡记录表
+   - 记录用户每日打卡情况
+   - 统计连续打卡天数、完成题数、正确率等
+
+### 初始数据
+- 5个语法模块（时态、从句、非谓语动词、虚拟语气、主谓一致）
+- 50道精选练习题，覆盖不同难度和题型
+- 自动生成今日练习配置
+
+## 页面路由
+
+### 底部导航栏页面（TabBar）
+- `/pages/practice/index` - 每日练习（首页）
+- `/pages/report/index` - 学习报告
+- `/pages/knowledge/index` - 语法知识
+- `/pages/profile/index` - 我的
+
+### 其他页面
+- `/pages/knowledge-detail/index` - 语法知识详情
+- `/pages/favorites/index` - 我的错题本
+
+## 开发指南
+
+### 环境要求
+- Node.js >= 16
+- pnpm >= 8
+
+### 安装依赖
+```bash
+pnpm install
+```
+
+### 开发调试
+```bash
+# 微信小程序
+pnpm run dev:weapp
+
+# H5
+pnpm run dev:h5
+```
+
+### 代码检查
+```bash
+pnpm run lint
+```
+
+### 构建生产版本
+```bash
+# 微信小程序
+pnpm run build:weapp
+
+# H5
+pnpm run build:h5
+```
+
+## 核心特性
+
+### 1. 智能学习系统
+- 自动记录学习进度和答题情况
+- 生成个性化学习报告
+- 识别薄弱环节并提供针对性建议
+
+### 2. 打卡激励机制
+- 每日打卡记录
+- 连续打卡天数统计
+- 打卡成就展示
+
+### 3. 社交分享功能
+- 支持分享到微信好友
+- 支持分享到朋友圈
+- 分享学习成果和打卡记录
+
+### 4. 错题本功能
+- 一键收藏错题
+- 随时查看和复习
+- 巩固薄弱知识点
+
+### 5. 离线支持
+- 支持离线查看当日已加载题目
+- 优化网络请求，减少流量消耗
+
+## 设计亮点
+
+### 配色方案
+- **主色调**：蓝色系（#4C9AFF）- 体现专业性和学习氛围
+- **辅助色**：暖黄色系（#FFC947）- 增添活力和激励感
+- **成功色**：绿色 - 表示正确答案和完成状态
+- **错误色**：红色 - 表示错误答案和需要改进的地方
+
+### 交互设计
+- 操作路径最短化，首页突出当日练习入口
+- 答题流程顺畅，解析页面可快速返回或收藏
+- 清晰的视觉反馈，即时显示答题结果
+- 流畅的动画过渡，提升用户体验
+
+### 响应式布局
+- 适配不同屏幕尺寸
+- 优化移动端触摸交互
+- 合理的间距和字体大小
+- 良好的可读性和可访问性
+
+## 环境变量
+
+项目使用 `.env` 文件管理环境变量：
+
+```env
+TARO_APP_SUPABASE_URL=your_supabase_url
+TARO_APP_SUPABASE_ANON_KEY=your_supabase_anon_key
+TARO_APP_NAME=英语语法每日一练
+TARO_APP_APP_ID=app-80793qvlnlz5
+```
+
+## 许可证
+
+MIT License
+
 ---
 
-## Repository Structure
-
-The project structure is as follows:
-
-```
-
-├── babel.config.js
-├── package.json
-├── pnpm-lock.yaml
-├── postcss.config.js
-├── project.config.json
-├── README.md
-├── tailwind.config.js
-├── tsconfig.check.json
-├── tsconfig.json
-├── config/
-│   ├── dev.ts
-│   ├── index.ts
-│   └── prod.ts
-├── scripts/
-├── src/
-│   ├── app.config.ts               # Taro app configuration, defining routes and tabBar, Please note that the "pages" must correctly correspond to the routes defined in src/pages.
-│   ├── app.scss
-│   ├── app.ts
-│   ├── index.html
-│   ├── client/
-│   │   └── supabase.ts             # Supabase client configuration, When you need to use Supabase, import and use it from this file.
-│   ├── db/                         # Database operations and Supabase integration, all database calls should be implemented here
-│   │   └── README.md
-│   ├── pages/                      # each folder corresponds to a route defined in app.config.ts
-│   │   ├── home/
-│   │   └── login/                  # Authentication page using miaoda-auth-taro component for user login functionality
-│   ├── store/                      # Global state management using Zustand for cross-page state sharing
-│   │   └── README.md
-│   └── types/                      # TypeScript type definitions
-│       └── global.d.ts
-└── supabase/
-```
-
-After you generate any files or update the structure of this project, please update the README.md file to reflect the changes.
-
-## Installation and Setup
-
-```bash
-pnpm install # Install dependencies
-```
-
-```bash
-pnpm run lint  # Lint source (Important: After modifying the code, please execute this command to perform necessary checks.)
-```
+**开发团队**：秒哒 AI 助手
+**最后更新**：2025-12-04
