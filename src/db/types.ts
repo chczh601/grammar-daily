@@ -1,5 +1,20 @@
 // 数据库表类型定义
 
+// 用户角色类型
+export type UserRole = 'user' | 'admin'
+
+// 用户信息表
+export interface Profile {
+  id: string
+  phone: string | null
+  email: string | null
+  nickname: string | null
+  avatar_url: string | null
+  role: UserRole
+  created_at: string
+  updated_at: string
+}
+
 export interface GrammarModule {
   id: string
   name: string

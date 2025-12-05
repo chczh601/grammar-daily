@@ -1,4 +1,5 @@
 const pages = [
+  'pages/login/index',
   'pages/practice/index',
   'pages/report/index',
   'pages/knowledge/index',

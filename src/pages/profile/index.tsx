@@ -1,9 +1,15 @@
 import {Button, ScrollView, Text, View} from '@tarojs/components'
 import Taro, {getEnv, useDidShow, useShareAppMessage, useShareTimeline} from '@tarojs/taro'
+import {useAuth} from 'miaoda-auth-taro'
 import {useCallback, useEffect, useState} from 'react'
-import {getContinuousDays, getTodayStats, getWeeklyReport} from '@/db/api'
+import {getContinuousDays, getCurrentUserProfile, getTodayStats, getWeeklyReport} from '@/db/api'
+import type {Profile as UserProfile} from '@/db/types'
 
 export default function Profile() {
+  // 添加登录保护
+  const {user, logout} = useAuth({guard: true})
+
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null)
   const [continuousDays, setContinuousDays] = useState(0)
   const [totalCompleted, setTotalCompleted] = useState(0)
   const [weeklyAccuracy, setWeeklyAccuracy] = useState(0)
@@ -24,11 +30,13 @@ export default function Profile() {
   const loadData = useCallback(async () => {
     setLoading(true)
     try {
-      const [days, todayStats, weeklyReport] = await Promise.all([
+      const [profile, days, todayStats, weeklyReport] = await Promise.all([
+        getCurrentUserProfile(),
         getContinuousDays(),
         getTodayStats(),
         getWeeklyReport()
       ])
+      setUserProfile(profile)
       setContinuousDays(days)
       setTotalCompleted(todayStats.completed_questions + (weeklyReport.total_questions || 0))
       setWeeklyAccuracy(weeklyReport.accuracy)
@@ -59,7 +67,23 @@ export default function Profile() {
     Taro.navigateTo({url: '/pages/favorites/index'})
   }
 
+  const handleLogout = async () => {
+    Taro.showModal({
+      title: '退出登录',
+      content: '确定要退出登录吗？',
+      success: async (res) => {
+        if (res.confirm) {
+          await logout()
+          Taro.showToast({title: '已退出登录', icon: 'success'})
+        }
+      }
+    })
+  }
+
   const isWeApp = getEnv() === 'WEAPP'
+
+  // 获取显示的用户名称
+  const displayName = userProfile?.nickname || userProfile?.phone || userProfile?.email || '学习者'
 
   return (
     <View style={{background: 'linear-gradient(to bottom, #EBF4FF, #FFFFFF)', minHeight: '100vh'}}>
@@ -80,8 +104,10 @@ export default function Profile() {
                   <View className="i-mdi-account text-white text-3xl" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-foreground font-bold text-xl block mb-1">学习者</Text>
-                  <Text className="text-muted-foreground text-sm">坚持学习，持续进步</Text>
+                  <Text className="text-foreground font-bold text-xl block mb-1">{displayName}</Text>
+                  <Text className="text-muted-foreground text-sm">
+                    {userProfile?.role === 'admin' ? '管理员' : '坚持学习，持续进步'}
+                  </Text>
                 </View>
               </View>
 
@@ -159,6 +185,15 @@ export default function Profile() {
                 </Text>
               </View>
             </View>
+          </View>
+
+          <View className="mt-4">
+            <Button
+              className="w-full bg-destructive text-destructive-foreground py-4 rounded-xl break-keep text-base"
+              size="default"
+              onClick={handleLogout}>
+              退出登录
+            </Button>
           </View>
         </View>
       </ScrollView>

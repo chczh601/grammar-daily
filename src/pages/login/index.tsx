@@ -5,7 +5,7 @@ import type React from 'react'
 
 const Login: React.FC = () => {
   const handleLoginSuccess = async (_user: any) => {
-    const path = '/pages/home/index' // home path
+    const path = '/pages/practice/index' // 跳转到每日练习首页
     try {
       switchTab({url: path})
     } catch (_e) {
@@ -14,8 +14,12 @@ const Login: React.FC = () => {
   }
 
   return (
-    <View>
-      <LoginPanel onLoginSuccess={handleLoginSuccess} />
+    <View
+      className="min-h-screen flex items-center justify-center"
+      style={{background: 'linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)))'}}>
+      <View className="w-full px-6">
+        <LoginPanel onLoginSuccess={handleLoginSuccess} />
+      </View>
     </View>
   )
 }

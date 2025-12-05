@@ -1,10 +1,14 @@
 import {ScrollView, Text, View} from '@tarojs/components'
 import Taro, {useDidShow} from '@tarojs/taro'
+import {useAuth} from 'miaoda-auth-taro'
 import {useCallback, useEffect, useState} from 'react'
 import {getFavoriteQuestions} from '@/db/api'
 import type {QuestionWithModule} from '@/db/types'
 
 export default function Favorites() {
+  // 添加登录保护
+  const {user} = useAuth({guard: true})
+
   const [favorites, setFavorites] = useState<QuestionWithModule[]>([])
   const [loading, setLoading] = useState(true)
 

@@ -127,58 +127,13 @@ export async function getQuestionById(id: string): Promise<Question | null> {
   return data
 }
 
-// 初始化今日练习
-export async function initTodayPractice(): Promise<boolean> {
-  const today = new Date().toISOString().split('T')[0]
-
-  // 检查今日练习是否已存在
-  const {data: existingPractice} = await supabase
-    .from('daily_practice')
-    .select('id')
-    .eq('practice_date', today)
-    .maybeSingle()
-
-  if (existingPractice) {
-    return true // 今日练习已存在
-  }
-
-  // 随机选择10道题目
-  const {data: allQuestions, error: questionsError} = await supabase
-    .from('questions')
-    .select('id')
-    .order('id', {ascending: true})
-
-  if (questionsError || !allQuestions || allQuestions.length === 0) {
-    console.error('获取题目列表失败:', questionsError)
-    return false
-  }
-
-  // 随机打乱并选择10道题
-  const shuffled = [...allQuestions].sort(() => Math.random() - 0.5)
-  const selectedIds = shuffled.slice(0, Math.min(10, shuffled.length)).map((q) => q.id)
-
-  // 创建今日练习记录
-  const {error: insertError} = await supabase.from('daily_practice').insert({
-    practice_date: today,
-    question_ids: selectedIds
-  })
-
-  if (insertError) {
-    console.error('创建今日练习失败:', insertError)
-    return false
-  }
-
-  return true
-}
-
 // 用户答题记录相关API
-export async function saveUserAnswer(questionId: string, userAnswer: string, isCorrect: boolean): Promise<boolean> {
-  const userId = await getCurrentUserId()
-  if (!userId) {
-    console.error('用户未登录')
-    return false
-  }
-
+export async function saveUserAnswer(
+  questionId: string,
+  userAnswer: string,
+  isCorrect: boolean,
+  userId: string = DEFAULT_USER_ID
+): Promise<boolean> {
   const {error} = await supabase.from('user_records').insert({
     user_id: userId,
     question_id: questionId,
@@ -194,10 +149,10 @@ export async function saveUserAnswer(questionId: string, userAnswer: string, isC
   return true
 }
 
-export async function getUserAnswerForQuestion(questionId: string): Promise<UserRecord | null> {
-  const userId = await getCurrentUserId()
-  if (!userId) return null
-
+export async function getUserAnswerForQuestion(
+  questionId: string,
+  userId: string = DEFAULT_USER_ID
+): Promise<UserRecord | null> {
   const {data, error} = await supabase
     .from('user_records')
     .select('*')
@@ -214,10 +169,7 @@ export async function getUserAnswerForQuestion(questionId: string): Promise<User
   return data
 }
 
-export async function getTodayAnsweredQuestions(): Promise<string[]> {
-  const userId = await getCurrentUserId()
-  if (!userId) return []
-
+export async function getTodayAnsweredQuestions(userId: string = DEFAULT_USER_ID): Promise<string[]> {
   const today = new Date().toISOString().split('T')[0]
   const {data, error} = await supabase
     .from('user_records')
@@ -234,11 +186,8 @@ export async function getTodayAnsweredQuestions(): Promise<string[]> {
 }
 
 // 收藏相关API
-export async function toggleFavorite(questionId: string): Promise<boolean> {
-  const userId = await getCurrentUserId()
-  if (!userId) return false
-
-  const record = await getUserAnswerForQuestion(questionId)
+export async function toggleFavorite(questionId: string, userId: string = DEFAULT_USER_ID): Promise<boolean> {
+  const record = await getUserAnswerForQuestion(questionId, userId)
 
   if (!record) {
     return false
@@ -253,10 +202,7 @@ export async function toggleFavorite(questionId: string): Promise<boolean> {
   return true
 }
 
-export async function getFavoriteQuestions(): Promise<QuestionWithModule[]> {
-  const userId = await getCurrentUserId()
-  if (!userId) return []
-
+export async function getFavoriteQuestions(userId: string = DEFAULT_USER_ID): Promise<QuestionWithModule[]> {
   const {data, error} = await supabase
     .from('user_records')
     .select(`
@@ -286,10 +232,7 @@ export async function getFavoriteQuestions(): Promise<QuestionWithModule[]> {
 }
 
 // 打卡相关API
-export async function checkIn(): Promise<CheckInRecord | null> {
-  const userId = await getCurrentUserId()
-  if (!userId) return null
-
+export async function checkIn(userId: string = DEFAULT_USER_ID): Promise<CheckInRecord | null> {
   const today = new Date().toISOString().split('T')[0]
 
   const {data: existingRecord} = await supabase
@@ -316,7 +259,7 @@ export async function checkIn(): Promise<CheckInRecord | null> {
 
   const continuousDays = yesterdayRecord ? yesterdayRecord.continuous_days + 1 : 1
 
-  const todayStats = await getTodayStats()
+  const todayStats = await getTodayStats(userId)
 
   const {data, error} = await supabase
     .from('check_in_records')
@@ -337,10 +280,10 @@ export async function checkIn(): Promise<CheckInRecord | null> {
   return data
 }
 
-export async function getCheckInRecords(limit: number = 30): Promise<CheckInRecord[]> {
-  const userId = await getCurrentUserId()
-  if (!userId) return []
-
+export async function getCheckInRecords(
+  userId: string = DEFAULT_USER_ID,
+  limit: number = 30
+): Promise<CheckInRecord[]> {
   const {data, error} = await supabase
     .from('check_in_records')
     .select('*')
@@ -355,10 +298,7 @@ export async function getCheckInRecords(limit: number = 30): Promise<CheckInReco
   return Array.isArray(data) ? data : []
 }
 
-export async function getContinuousDays(): Promise<number> {
-  const userId = await getCurrentUserId()
-  if (!userId) return 0
-
+export async function getContinuousDays(userId: string = DEFAULT_USER_ID): Promise<number> {
   const today = new Date().toISOString().split('T')[0]
 
   const {data} = await supabase
@@ -372,17 +312,7 @@ export async function getContinuousDays(): Promise<number> {
 }
 
 // 统计相关API
-export async function getTodayStats(): Promise<DailyStats> {
-  const userId = await getCurrentUserId()
-  if (!userId) {
-    return {
-      total_questions: 0,
-      completed_questions: 0,
-      correct_count: 0,
-      accuracy: 0
-    }
-  }
-
+export async function getTodayStats(userId: string = DEFAULT_USER_ID): Promise<DailyStats> {
   const today = new Date().toISOString().split('T')[0]
 
   const todayQuestions = await getTodayQuestions()
@@ -418,27 +348,12 @@ export async function getTodayStats(): Promise<DailyStats> {
   }
 }
 
-export async function getWeeklyReport(): Promise<WeeklyReport> {
-  const userId = await getCurrentUserId()
-
+export async function getWeeklyReport(userId: string = DEFAULT_USER_ID): Promise<WeeklyReport> {
   const today = new Date()
   const weekStart = new Date(today)
   weekStart.setDate(today.getDate() - today.getDay())
   const weekStartStr = weekStart.toISOString().split('T')[0]
   const weekEndStr = today.toISOString().split('T')[0]
-
-  if (!userId) {
-    return {
-      week_start: weekStartStr,
-      week_end: weekEndStr,
-      total_days: 7,
-      practice_days: 0,
-      total_questions: 0,
-      correct_count: 0,
-      accuracy: 0,
-      weak_modules: []
-    }
-  }
 
   const {data, error} = await supabase
     .from('user_records')
@@ -502,4 +417,36 @@ export async function getWeeklyReport(): Promise<WeeklyReport> {
     accuracy: Math.round(accuracy),
     weak_modules: weakModules
   }
+}
+
+// 初始化每日练习（如果今天没有配置）
+export async function initTodayPractice(): Promise<boolean> {
+  const today = new Date().toISOString().split('T')[0]
+
+  const {data: existing} = await supabase.from('daily_practice').select('id').eq('practice_date', today).maybeSingle()
+
+  if (existing) {
+    return true
+  }
+
+  const {data: allQuestions} = await supabase.from('questions').select('id').order('id', {ascending: true})
+
+  if (!allQuestions || allQuestions.length < 10) {
+    console.error('题库题目不足')
+    return false
+  }
+
+  const shuffled = [...allQuestions].sort(() => Math.random() - 0.5)
+  const selectedIds = shuffled.slice(0, 10).map((q) => q.id)
+
+  const {error} = await supabase.from('daily_practice').insert({
+    practice_date: today,
+    question_ids: selectedIds
+  })
+
+  if (error) {
+    console.error('初始化今日练习失败:', error)
+    return false
+  }
+  return true
 }

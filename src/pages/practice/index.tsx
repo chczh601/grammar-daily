@@ -1,5 +1,6 @@
 import {Button, ScrollView, Text, View} from '@tarojs/components'
 import Taro, {useDidShow, useShareAppMessage, useShareTimeline} from '@tarojs/taro'
+import {useAuth} from 'miaoda-auth-taro'
 import {useCallback, useEffect, useState} from 'react'
 import {
   checkIn,
@@ -13,6 +14,9 @@ import {
 import type {QuestionWithModule} from '@/db/types'
 
 export default function Practice() {
+  // 添加登录保护
+  const {user} = useAuth({guard: true})
+
   const [questions, setQuestions] = useState<QuestionWithModule[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [selectedAnswer, setSelectedAnswer] = useState('')

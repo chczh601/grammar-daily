@@ -1,10 +1,14 @@
 import {ScrollView, Text, View} from '@tarojs/components'
 import Taro, {useDidShow} from '@tarojs/taro'
+import {useAuth} from 'miaoda-auth-taro'
 import {useCallback, useEffect, useState} from 'react'
 import {getCheckInRecords, getTodayStats, getWeeklyReport} from '@/db/api'
 import type {CheckInRecord, DailyStats, WeeklyReport} from '@/db/types'
 
 export default function Report() {
+  // 添加登录保护
+  const {user} = useAuth({guard: true})
+
   const [todayStats, setTodayStats] = useState<DailyStats | null>(null)
   const [weeklyReport, setWeeklyReport] = useState<WeeklyReport | null>(null)
   const [checkInRecords, setCheckInRecords] = useState<CheckInRecord[]>([])
