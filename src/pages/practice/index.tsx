@@ -80,7 +80,18 @@ export default function Practice() {
       return
     }
 
-    const correct = selectedAnswer.trim().toLowerCase() === currentQuestion.answer.trim().toLowerCase()
+    // 判断答案是否正确
+    let correct = false
+    if (currentQuestion.type === 'single_choice') {
+      // 单选题：从完整选项文本中提取选项字母（如 "B. went" -> "B"）
+      const selectedLetter = selectedAnswer.trim().split('.')[0].trim()
+      const correctAnswer = currentQuestion.answer.trim()
+      correct = selectedLetter.toLowerCase() === correctAnswer.toLowerCase()
+    } else {
+      // 填空题和改错题：直接比较答案文本
+      correct = selectedAnswer.trim().toLowerCase() === currentQuestion.answer.trim().toLowerCase()
+    }
+
     setIsCorrect(correct)
     setShowResult(true)
 
