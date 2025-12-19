@@ -41,11 +41,11 @@
     "@tarojs/taro": "4.1.5",
     "immer": "^10.1.1",
     "miaoda-auth-taro": "0.0.8",
-    "miaoda-sc-plugin": "1.0.31",
+    "miaoda-sc-plugin": "1.0.38",
     "miaoda-taro-utils": "0.0.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "supabase-wechat-js": "0.0.5",
+    "supabase-wechat-js": "0.0.7",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
