@@ -1,3 +1,7 @@
+# 欢迎使用你的秒哒应用代码包
+秒哒应用链接
+    URL:https://www.miaoda.cn/projects/app-80793qvlnlz5
+
 # 英语语法每日一练小程序
 
 这是一个基于 Taro + React + TypeScript 开发的英语语法学习微信小程序，旨在帮助用户通过每日练习提升英语语法能力。
